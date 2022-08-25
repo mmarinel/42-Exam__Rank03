@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:24:54 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 14:51:29 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 19:41:30 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,13 +120,27 @@ t_point	get_closest_border_pt(t_rectangle rect, t_point p)
 
 int	my_ceil(float nbr)
 {
-	if ((int)nbr < nbr)
-		return ((int)nbr + 1);
+	if (nbr >= 0)
+	{
+		if ((int)nbr < nbr)
+			return ((int)nbr + 1);
+		else
+			return ((int)nbr);
+	}
 	else
+	{
 		return ((int)nbr);
+	}
 }
 
 int	my_floor(float nbr)
 {
-	return ((int)nbr);
+	if (nbr >= 0)
+	{
+		return ((int)nbr);
+	}
+	else
+	{
+		return ((int)nbr - 1);
+	}
 }

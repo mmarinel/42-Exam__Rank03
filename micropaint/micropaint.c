@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:13:33 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 14:28:55 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 19:36:22 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static int	micropaint(FILE *fhandle)
 			{
 				break ;
 			}
-			if (scan_ret != 6 || rectangle.width == 0 || rectangle.height == 0
+			if (scan_ret != 6 || rectangle.width <= 0 || rectangle.height <= 0
 				|| (rectangle.type != 'R' && rectangle.type != 'r'))
 			{
 				write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
@@ -78,8 +78,8 @@ static int	zone_init(t_zone *drawZone, FILE *fhandle)
 {
 	if (3 != fscanf(fhandle, "%d %d %c",
 			&drawZone->width, &drawZone->height, &drawZone->b_char)
-		|| ( drawZone->width < 0 || drawZone->width > 300)
-		|| ( drawZone->height < 0 || drawZone->height > 300))
+		|| ( drawZone->width <= 0 || drawZone->width > 300)
+		|| ( drawZone->height <= 0 || drawZone->height > 300))
 	{
 		write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
 		return (1);
@@ -109,6 +109,8 @@ static void	draw_rectangle(t_rectangle rect, t_zone *drawZone)
 {
 	t_point	p;
 
+	if (rect.mark == '\n')
+		rect.mark = drawZone->b_char;
 	rectangle_fill_points(&rect);
 	for (int y = 0; y < drawZone->height; y++)
 		for (int x = 0; x < drawZone->width; x++)
