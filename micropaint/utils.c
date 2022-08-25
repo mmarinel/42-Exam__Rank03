@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:24:54 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 14:05:17 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 14:46:30 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +59,17 @@ float	distance(t_point a, t_point b)
 
 void	rectangle_fill_points(t_rectangle *rect)
 {
-	rect->top_right.x = rect->top_left.x + (rect->width);
+	rect->top_right.x = floor(rect->top_left.x + (rect->width));
 	rect->top_right.y = rect->top_left.y;
 
-	rect->bottom_right.x = rect->top_left.x + (rect->width);
-	rect->bottom_right.y = rect->top_left.y + (rect->height);
+	rect->bottom_right.x = floor(rect->top_left.x + (rect->width));
+	rect->bottom_right.y = floor(rect->top_left.y + (rect->height));
 
 	rect->bottom_left.x = rect->top_left.x;
 	rect->bottom_left.y = rect->bottom_right.y;
 
+	rect->top_left.x = ceil(rect->top_left.x);
+	rect->top_left.y = ceil(rect->top_left.y);
 // 	printf("top left: y: %f, x: %f\n
 // top right: y: %f, x: %f\n
 // bottom left: y: %f, x: %f\n
@@ -114,4 +116,12 @@ t_point	get_closest_border_pt(t_rectangle rect, t_point p)
 		closest.x = p.x;
 	}
 	return (closest);
+}
+
+int	ceiling(float nbr)
+{
+	if ((int)(nbr + 1) - nbr < 0.5)
+		return (int)(nbr + 1);
+	else
+		return (int)nbr;
 }

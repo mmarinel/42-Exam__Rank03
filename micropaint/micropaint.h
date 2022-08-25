@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:14:11 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 12:22:56 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 14:37:03 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_rectangle
 }	t_rectangle;
 
 //* utils
+int		ceiling(float nbr);
 size_t	ft_strlen(char const *str);
 void	*ft_memset(void *s, int c, size_t len);
 void	print_matrix(char **matrix, size_t rows, size_t columns);
