@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:13:33 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 19:36:22 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 21:39:55 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,7 @@ static int	zone_init(t_zone *drawZone, FILE *fhandle)
 				return (1);
 			}
 			ft_memset(drawZone->map[i], drawZone->b_char, drawZone->width);
-			// drawZone->map[i][drawZone->width] = '\0';
 		}
-		// print_matrix(drawZone->map, drawZone->height, drawZone->width);
 		return (0);
 	}
 }
@@ -111,7 +109,7 @@ static void	draw_rectangle(t_rectangle rect, t_zone *drawZone)
 
 	if (rect.mark == '\n')
 		rect.mark = drawZone->b_char;
-	rectangle_fill_points(&rect);
+	rectangle_set_edges(&rect);
 	for (int y = 0; y < drawZone->height; y++)
 		for (int x = 0; x < drawZone->width; x++)
 		{
@@ -119,11 +117,9 @@ static void	draw_rectangle(t_rectangle rect, t_zone *drawZone)
 			p.y = y;
 			if (is_in_rectangle(p, rect))
 			{
-				// exit(0);
 				if (rect.type == 'R'
-					|| (rect.type == 'r' && distance(p, get_closest_border_pt(rect, p)) < 1))
+					|| distance(p, get_closest_border_pt(rect, p)) < 1)
 					drawZone->map[y][x] = rect.mark;
 			}
 		}
-	// print_matrix(drawZone->map, drawZone->height, drawZone->width);
 }

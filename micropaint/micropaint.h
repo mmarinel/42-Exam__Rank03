@@ -6,7 +6,7 @@
 /*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:14:11 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 14:52:04 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/25 21:42:07 by earendil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,13 @@ typedef struct s_rectangle
 //* utils
 int		my_ceil(float nbr);
 int		my_floor(float nbr);
+float	my_abs(float nbr);
 size_t	ft_strlen(char const *str);
 void	*ft_memset(void *s, int c, size_t len);
 void	print_matrix(char **matrix, size_t rows, size_t columns);
 void	free_matrix(char **matrix, size_t rows);
 float	distance(t_point a, t_point b);
-void	rectangle_fill_points(t_rectangle *rect);
+void	rectangle_set_edges(t_rectangle *rect);
 int		is_in_rectangle(t_point p, t_rectangle rect);
 t_point	get_closest_border_pt(t_rectangle rect, t_point p);
 
