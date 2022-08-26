@@ -6,7 +6,7 @@
 #    By: earendil <earendil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/26 11:02:25 by earendil          #+#    #+#              #
-#    Updated: 2022/08/26 13:10:59 by earendil         ###   ########.fr        #
+#    Updated: 2022/08/26 14:06:30 by earendil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,6 +37,8 @@ NAME := minipaint
 OBJS_DIR:= bin
 OBJS:= $(addprefix $(OBJS_DIR)/, $(shell find . -name "*.c" -print | sed 's/\.c/\.o/g' | sed 's/\.\///'))
 INCLUDES:= $(shell find . -name "*.h" -print)
+TESTER_DIR := ../../examRank-03_Tester/mini_paint/
+TESTING_TIME = 60
 
 RMF:= @/bin/rm -rf
 MKD:= @mkdir -p
@@ -47,6 +49,9 @@ exam: .BUILD
 test:
 	@$(MAKE_REC) .TEST 2>/dev/null
 
+testall:
+	@$(MAKE_REC) .TESTALL 2>/dev/null
+
 all:
 	@$(MAKE_REC) -C ..
 
@@ -54,10 +59,10 @@ $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
 	@printf "Moving compressed source code to Tester directory\n\033[0;37m"
 	@cat minipaint.h > mini_paint.c && cat minipaint.c >> mini_paint.c && cat utils.c >> mini_paint.c
-	@mv mini_paint.c ../../examRank-03_Tester/mini_paint/
-	@cd ../../examRank-03_Tester/mini_paint/ && touch minipaint.h && cd $(PROJ_DIR)
+	@mv mini_paint.c $(TESTER_DIR)
+	@cd $(TESTER_DIR) && touch minipaint.h && cd $(PROJ_DIR)
 	@printf "file moved!\n\033[0;37m"
-	@printf "\033[0;35mProject done!\n\n\033[0;37m"
+	@echo "\033[0;35mProject done!\n\n\033[0;37m"
 
 $(shell echo $(OBJS_DIR))/%.o: %.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
@@ -65,6 +70,9 @@ $(shell echo $(OBJS_DIR))/%.o: %.c $(INCLUDES)
 fclean: clean
 	@printf "removing program executable $(NAME)\n\033[0;37m"
 	$(RMF) -f $(NAME)
+	$(RMF) -f coutput
+	$(RMF) -f output
+	$(RMF) -f example_
 	@printf "\033[0;35mExecutable removed!\n\n\033[0;37m"
 
 clean:
@@ -85,4 +93,12 @@ re: fclean all
 	@vim filetto
 	@./$(NAME) filetto;
 	@$(RMF) filetto
+	@echo $(CYAN) "\nTests done!\n" $(RESET)
+
+.TESTALL: fclean exam
+	@$(RMF) filetto
+	@echo $(CYAN)"Running tester for $(TESTING_TIME) secs\n"$(RESET)\
+	"You can set your desired testing time in the TESTING_TIME makefile variable (default is 60 secs)\
+	\n(original tester doesn't stop until it finds an error)\n"
+	@cd $(TESTER_DIR) && timeout $(TESTING_TIME)s ./test.sh && cd $(PROJ_DIR)
 	@echo $(CYAN) "\nTests done!\n" $(RESET)
