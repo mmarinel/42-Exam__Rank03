@@ -6,7 +6,7 @@
 #    By: earendil <earendil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/26 11:02:25 by earendil          #+#    #+#              #
-#    Updated: 2022/08/26 14:02:07 by earendil         ###   ########.fr        #
+#    Updated: 2022/08/26 14:07:28 by earendil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,6 +72,7 @@ fclean: clean
 	$(RMF) -f $(NAME)
 	$(RMF) -f coutput
 	$(RMF) -f output
+	$(RMF) -f example_
 	@printf "\033[0;35mExecutable removed!\n\n\033[0;37m"
 
 clean:
