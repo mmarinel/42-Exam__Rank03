@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: earendil <earendil@student.42.fr>          +#+  +:+       +#+         #
+#    By: mmarinel <mmarinel@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/26 11:02:25 by earendil          #+#    #+#              #
-#    Updated: 2022/08/26 14:07:28 by earendil         ###   ########.fr        #
+#    Updated: 2022/08/31 19:53:27 by mmarinel         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ NAME := micropaint
 OBJS_DIR:= bin
 OBJS:= $(addprefix $(OBJS_DIR)/, $(shell find . -name "*.c" -print | sed 's/\.c/\.o/g' | sed 's/\.\///'))
 INCLUDES:= $(shell find . -name "*.h" -print)
-TESTER_DIR := ../../examRank-03_Tester/micro_paint/
+TESTER_DIR := ../42-exam-rank-03/micro_paint/
 TESTING_TIME = 60
 
 RMF:= @/bin/rm -rf
@@ -50,22 +50,20 @@ test:
 	@$(MAKE_REC) .TEST 2>/dev/null
 
 testall:
+	@rm -rf ../42-exam-rank-03
+	@git clone https://github.com/Glagan/42-exam-rank-03.git ../42-exam-rank-03
 	@$(MAKE_REC) .TESTALL 2>/dev/null
+	@rm -rf ../42-exam-rank-03
 
 all:
 	@$(MAKE_REC) -C ..
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-	@printf "Moving compressed source code to Tester directory\n\033[0;37m"
-	@cat micropaint.h > micro_paint.c && cat micropaint.c >> micro_paint.c && cat utils.c >> micro_paint.c
-	@mv micro_paint.c $(TESTER_DIR)
-	@cd $(TESTER_DIR) && touch micropaint.h && cd $(PROJ_DIR)
-	@printf "file moved!\n\033[0;37m"
-	@echo "\033[0;35mProject done!\n\n\033[0;37m"
+	@echo "\033[0;35mProject compiled!\n\n\033[0;37m"
 
 $(shell echo $(OBJS_DIR))/%.o: %.c $(INCLUDES)
-	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 fclean: clean
 	@printf "removing program executable $(NAME)\n\033[0;37m"
@@ -96,6 +94,11 @@ re: fclean all
 	@echo $(CYAN) "\nTests done!\n" $(RESET)
 
 .TESTALL: fclean exam
+	@printf "Moving compressed source code to Tester directory\n\033[0;37m"
+	@cat micropaint.h > micro_paint.c && cat micropaint.c >> micro_paint.c && cat utils.c >> micro_paint.c
+	@mv micro_paint.c $(TESTER_DIR)
+	@cd $(TESTER_DIR) && touch micropaint.h && cd $(PROJ_DIR)
+	@printf "file moved!\n\033[0;37m"
 	@$(RMF) filetto
 	@echo $(CYAN)"Running tester for $(TESTING_TIME) secs\n"$(RESET)\
 	"You can set your desired testing time in the TESTING_TIME makefile variable (default is 60 secs)\
