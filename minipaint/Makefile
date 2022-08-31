@@ -87,7 +87,7 @@ re: fclean all
 
 .TEST: fclean exam
 	@$(RMF) filetto
-	@echo ": + q to exit\nremove this lines now" >> filetto
+	@echo '\tpress: "dd" to delte line, "i" to insert\ttype: ":w" to save, ":q" to exit\nREMOVE THESE LINES NOW!' >> filetto
 	@vim filetto
 	@./$(NAME) filetto;
 	@$(RMF) filetto
