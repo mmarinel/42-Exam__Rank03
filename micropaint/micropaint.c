@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   micropaint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmarinel <mmarinel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:13:33 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 21:39:55 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/31 19:04:48 by mmarinel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "micropaint.h"
 
 static int	micropaint(FILE *fhandle);
-static int	zone_init(t_zone *drawZone, FILE *fhandle);
-static void	draw_rectangle(t_rectangle rect, t_zone *drawZone);
+static int	region_init(t_region *drawRegion, FILE *fhandle);
+static void	draw_rectangle(t_rectangle rect, t_region *drawRegion);
 //* end of static declarations
 
 int main(int argc, char const *argv[])
@@ -23,14 +23,17 @@ int main(int argc, char const *argv[])
 
 	if (argc == 2)
 	{
-		fhandle = fopen(argv[1], "r");
-		if (NULL == fhandle)
+		if (
+			NULL	==	(fhandle = fopen(argv[1], "r"))
+			|| 1	==	micropaint(fhandle)
+			|| EOF	==	fclose(fhandle)
+		)
 		{
 			write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
 			return (1);
 		}
 		else
-			return (micropaint(fhandle));
+			return (0);
 	}
 	else
 	{
@@ -41,9 +44,9 @@ int main(int argc, char const *argv[])
 
 static int	micropaint(FILE *fhandle)
 {
-	t_zone	drawZone;
+	t_region	drawRegion;
 	
-	if (zone_init(&drawZone, fhandle))
+	if (region_init(&drawRegion, fhandle))
 		return (1);
 	else
 	{
@@ -62,64 +65,62 @@ static int	micropaint(FILE *fhandle)
 			if (scan_ret != 6 || rectangle.width <= 0 || rectangle.height <= 0
 				|| (rectangle.type != 'R' && rectangle.type != 'r'))
 			{
-				write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
-				free_matrix(drawZone.map, drawZone.height);
+				free_matrix(drawRegion.map, drawRegion.height);
 				return (1);
 			}
-			draw_rectangle(rectangle, &drawZone);
+			draw_rectangle(rectangle, &drawRegion);
 		}
-		print_matrix(drawZone.map, drawZone.height, drawZone.width);
-		free_matrix(drawZone.map, drawZone.height);
+		print_matrix(drawRegion.map, drawRegion.height, drawRegion.width);
+		free_matrix(drawRegion.map, drawRegion.height);
 		return (0);
 	}
 }
 
-static int	zone_init(t_zone *drawZone, FILE *fhandle)
+static int	region_init(t_region *drawRegion, FILE *fhandle)
 {
 	if (3 != fscanf(fhandle, "%d %d %c",
-			&drawZone->width, &drawZone->height, &drawZone->b_char)
-		|| ( drawZone->width <= 0 || drawZone->width > 300)
-		|| ( drawZone->height <= 0 || drawZone->height > 300))
+			&drawRegion->width, &drawRegion->height, &drawRegion->b_char)
+		|| ( drawRegion->width <= 0 || drawRegion->width > 300)
+		|| ( drawRegion->height <= 0 || drawRegion->height > 300))
 	{
-		write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
 		return (1);
 	}
 	else
 	{
-		drawZone->map = (char **) malloc(drawZone->height * sizeof(char *));
-		if (NULL == drawZone->map)
+		drawRegion->map = (char **) malloc(drawRegion->height * sizeof(char *));
+		if (NULL == drawRegion->map)
 			return (1);
-		for (int i = 0; i < drawZone->height; i++)
+		for (int i = 0; i < drawRegion->height; i++)
 		{
-			drawZone->map[i] = (char *) malloc(drawZone->width * sizeof(char));
-			if (NULL == drawZone->map[i])
+			drawRegion->map[i] = (char *) malloc(drawRegion->width * sizeof(char));
+			if (NULL == drawRegion->map[i])
 			{
-				free_matrix(drawZone->map, i);
+				free_matrix(drawRegion->map, i);
 				return (1);
 			}
-			ft_memset(drawZone->map[i], drawZone->b_char, drawZone->width);
+			memset(drawRegion->map[i], drawRegion->b_char, drawRegion->width);
 		}
 		return (0);
 	}
 }
 
-static void	draw_rectangle(t_rectangle rect, t_zone *drawZone)
+static void	draw_rectangle(t_rectangle rect, t_region *drawRegion)
 {
 	t_point	p;
 
 	if (rect.mark == '\n')
-		rect.mark = drawZone->b_char;
+		rect.mark = drawRegion->b_char;
 	rectangle_set_edges(&rect);
-	for (int y = 0; y < drawZone->height; y++)
-		for (int x = 0; x < drawZone->width; x++)
+	for (int i = 0; i < drawRegion->height; i++)
+		for (int j = 0; j < drawRegion->width; j++)
 		{
-			p.x = x;
-			p.y = y;
+			p.x = j;
+			p.y = i;
 			if (is_in_rectangle(p, rect))
 			{
 				if (rect.type == 'R'
 					|| distance(p, get_closest_border_pt(rect, p)) < 1)
-					drawZone->map[y][x] = rect.mark;
+					drawRegion->map[i][j] = rect.mark;
 			}
 		}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   micropaint.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmarinel <mmarinel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 18:14:11 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/25 21:42:07 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/31 18:59:15 by mmarinel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <string.h>
 
 # include <math.h>
 
@@ -28,13 +29,13 @@ typedef struct s_point
 	float	y;
 }	t_point;
 
-typedef struct s_zone
+typedef struct s_region
 {
 	int		width;
 	int		height;
 	char	b_char;
 	char	**map;
-}	t_zone;
+}	t_region;
 
 typedef struct s_rectangle
 {
@@ -49,17 +50,26 @@ typedef struct s_rectangle
 }	t_rectangle;
 
 //* utils
-int		my_ceil(float nbr);
-int		my_floor(float nbr);
-float	my_abs(float nbr);
+
 size_t	ft_strlen(char const *str);
-void	*ft_memset(void *s, int c, size_t len);
+
+	//* math utils
+
+int		ft_ceil(float nbr);
+int		ft_floor(float nbr);
+float	ft_abs(float nbr);
+
+float	distance(t_point a, t_point b);
+
+	//* map
+
 void	print_matrix(char **matrix, size_t rows, size_t columns);
 void	free_matrix(char **matrix, size_t rows);
-float	distance(t_point a, t_point b);
+
+	//* rectangles
+
 void	rectangle_set_edges(t_rectangle *rect);
 int		is_in_rectangle(t_point p, t_rectangle rect);
 t_point	get_closest_border_pt(t_rectangle rect, t_point p);
-
 
 #endif

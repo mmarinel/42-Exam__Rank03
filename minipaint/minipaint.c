@@ -3,33 +3,37 @@
 /*                                                        :::      ::::::::   */
 /*   minipaint.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: earendil <earendil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmarinel <mmarinel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/26 10:25:19 by earendil          #+#    #+#             */
-/*   Updated: 2022/08/26 11:24:40 by earendil         ###   ########.fr       */
+/*   Updated: 2022/08/31 19:30:29 by mmarinel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minipaint.h"
 
-static int	minipaint(FILE *handle);
-static int	zone_init(t_zone *zone, FILE *handle);
-static void	draw_circle(t_circle circle, t_zone *zone);
+static int	minipaint(FILE *fhandle);
+static int	region_init(t_region *drawRegion, FILE *fhandle);
+static void	draw_circle(t_circle circle, t_region *drawRegion);
 //* end of static declarations
 
 int main(int argc, char const *argv[])
 {
 	if (argc == 2)
 	{
-		FILE	*handle;
+		FILE	*fhandle;
 
-		handle = fopen(argv[1], "r");
-		if (NULL == handle)
+		if (
+			NULL	==	(fhandle = fopen(argv[1], "r"))
+			|| 1	==	minipaint(fhandle)
+			|| EOF	== fclose(fhandle)
+		)
 		{
 			write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
 			return (1);
 		}
-		return (minipaint(handle));
+		else
+			return (0);
 	}
 	else
 	{
@@ -38,11 +42,11 @@ int main(int argc, char const *argv[])
 	}
 }
 
-static int	minipaint(FILE *handle)
+static int	minipaint(FILE *fhandle)
 {
-	t_zone	zone;
+	t_region	drawRegion;
 
-	if (zone_init(&zone, handle))
+	if (region_init(&drawRegion, fhandle))
 		return (1);
 	else
 	{
@@ -51,7 +55,7 @@ static int	minipaint(FILE *handle)
 
 		while (1)
 		{
-			scan_return = fscanf(handle,
+			scan_return = fscanf(fhandle,
 						"\n%c %f %f %f %c",
 						&circle.type,
 						&circle.center.x, &circle.center.y,
@@ -64,27 +68,26 @@ static int	minipaint(FILE *handle)
 				|| (circle.type != 'c' && circle.type != 'C')
 				|| circle.radius <= 0)
 			{
-				write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
-				free_matrix(zone.map, zone.height);
+				free_matrix(drawRegion.map, drawRegion.height);
 				return (1);
 			}
-			draw_circle(circle, &zone);
+			draw_circle(circle, &drawRegion);
 		}
-		print_matrix(zone.map, zone.height, zone.width);
-		free_matrix(zone.map, zone.height);
+		print_matrix(drawRegion.map, drawRegion.height, drawRegion.width);
+		free_matrix(drawRegion.map, drawRegion.height);
 		return (0);
 	}
 }
 
-static void	draw_circle(t_circle circle, t_zone *zone)
+static void	draw_circle(t_circle circle, t_region *drawRegion)
 {
 	t_point	p;
 
 	if (circle.mark == '\n')
-		circle.mark = zone->b_char;
-	for (int i = 0; i < zone->height; i++)
+		circle.mark = drawRegion->b_char;
+	for (int i = 0; i < drawRegion->height; i++)
 	{
-		for (int j = 0; j < zone->width; j++)
+		for (int j = 0; j < drawRegion->width; j++)
 		{
 			p.x = j;
 			p.y = i;
@@ -92,34 +95,35 @@ static void	draw_circle(t_circle circle, t_zone *zone)
 			if (is_in_circle(p, circle))
 			{
 				if (circle.type == 'C'
-					|| circumference_distance(circle, p) < 1)
-					zone->map[i][j] = circle.mark;
+					|| distance_from_circumference(p, circle) < 1)
+					drawRegion->map[i][j] = circle.mark;
 			}
 		}
 	}
 }
 
-static int	zone_init(t_zone *zone, FILE *handle)
+static int	region_init(t_region *drawRegion, FILE *fhandle)
 {
-	if (3 != fscanf(handle, "%d %d %c", &zone->width, &zone->height, &zone->b_char)
-		|| (zone->width <= 0 || zone->width > 300)
-		|| (zone->height <= 0 || zone->height > 300))
-	{
-		write(STDOUT_FILENO, IO_ERR, ft_strlen(IO_ERR));
+	if (3 != fscanf(fhandle, "%d %d %c",
+				&drawRegion->width, &drawRegion->height, &drawRegion->b_char)
+		|| (drawRegion->width <= 0 || drawRegion->width > 300)
+		|| (drawRegion->height <= 0 || drawRegion->height > 300))
 		return (1);
-	}
-	zone->map = (char **) malloc(zone->height * sizeof(char *));
-	if (NULL == zone->map)
-		return (1);
-	for (int i = 0; i < zone->height; i++)
+	else
 	{
-		zone->map[i] = (char *) malloc(zone->width * sizeof(char));
-		if (NULL == zone->map[i])
-		{
-			free_matrix(zone->map, i);
+		drawRegion->map = (char **) malloc(drawRegion->height * sizeof(char *));
+		if (NULL == drawRegion->map)
 			return (1);
+		for (int i = 0; i < drawRegion->height; i++)
+		{
+			drawRegion->map[i] = (char *) malloc(drawRegion->width * sizeof(char));
+			if (NULL == drawRegion->map[i])
+			{
+				free_matrix(drawRegion->map, i);
+				return (1);
+			}
+			memset(drawRegion->map[i], drawRegion->b_char, drawRegion->width);
 		}
-		memset(zone->map[i], zone->b_char, zone->width);
+		return (0);
 	}
-	return (0);
 }
